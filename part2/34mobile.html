@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+  <title>Мобильные устройства</title>
+  <style>
+    body {
+      height: 1000px;
+    }
+    .box {
+      width: 150px;
+      height: 150px;
+      background-color: red;
+    }
+  </style>
+</head>
+<body>
+  <p>Для теста надо перевести браузер в режим адаптивного дизайна (в firefox - Ctrl+Shift+M), 
+    включить эмуляцию сенсорного ввода, при необходимости и перезагрузить страницу</p>
+  <div class="box">
+    Touch me!
+  </div>
+  <div class="result"></div>
+  <script>
+    'use strict;'
+    window.addEventListener('DOMContentLoaded',() => {
+      const box = document.querySelector(".box");
+      const text = document.querySelector(".result");
+      box.addEventListener('touchstart',(e) => {
+        e.preventDefault();
+        console.log('Start',e.touches);
+      });
+      box.addEventListener('touchend',(e) => {
+        e.preventDefault();
+        console.log('End');
+      });
+      box.addEventListener('touchmove',(e) => {
+        e.preventDefault();
+        //console.log('Move');
+        text.innerHTML=`Move: pageX: ${e.touches[0].pageX} pageY: ${e.touches[0].pageY}`;
+        text.innerHTML+=`<BR>screenX: ${e.touches[0].screenX} screenY: ${e.touches[0].screenY}`;
+      });
+
+
+    });
+
+  </script>
+</body>
+</html>
