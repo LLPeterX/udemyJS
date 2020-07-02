@@ -1,0 +1,17 @@
+button {
+  height: 30px;
+  width: 150px;
+}
+
+.blue-some {
+  background-color: blue;
+}
+
+.red {
+  background-color: red;
+}
+
+.btn-block {
+  background-color: lightgray;
+  padding: 10px;
+}

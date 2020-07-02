@@ -3,3 +3,4 @@ www.udemy.com
 
 Part1: Подготовка к работе
 Part2: Основы JavaScript
+Part3: Javascript в работе
