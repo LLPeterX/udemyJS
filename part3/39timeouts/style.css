@@ -1,0 +1,24 @@
+.box {
+  height: 100px;
+  width: 100px;
+  background-color: red;
+  border: 2px solid yellow;
+}
+.show {
+display: block;
+}
+
+.hide {
+  display: none;
+}
+
+.abs {
+  position: absolute;
+}
+.moving-box {
+  height: 50px;
+  width: 50px;
+  position: absolute;
+  background-color: blue;
+
+}
