@@ -6,6 +6,7 @@ window.addEventListener('DOMContentLoaded', () => {
     tabContent = document.querySelectorAll(".tabcontent"),
     menuContainer = document.querySelector(".tabheader__items");
 
+
   function hideTabContent() {
     // скрываем содержимое 
     //tabContent.forEach((item) => item.style.display="none" );
@@ -74,19 +75,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function updateClock() {
       const t = getRemainingTime(endtime);
-      console.log(t.total);
-      
+
       if (t.total <= 0) {
         console.log('Timer stop');
         // скрываем div с пром-акцией
-        document.querySelector('.promotion').style.display="none";
+        document.querySelector('.promotion').style.display = "none";
         clearInterval(actionsTimer);
       }
 
-      daysElement.textContent = leadingZero(t.days,false);
-      hoursElement.textContent = leadingZero(t.hours,true);
-      minElement.textContent = leadingZero(t.minutes,true);
-      secElement.textContent = leadingZero(t.seconds,true);
+      daysElement.textContent = leadingZero(t.days, false);
+      hoursElement.textContent = leadingZero(t.hours, true);
+      minElement.textContent = leadingZero(t.minutes, true);
+      secElement.textContent = leadingZero(t.seconds, true);
     }
 
     function leadingZero(value, isNeedZero) {
@@ -112,43 +112,49 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   setClock(".timer", deadline);
-  // ниже мой вариант - хреновый
-  /*
-    const daysElement = document.querySelector('#days'),
-        hoursElement=document.querySelector('#hours'),
-        minElement = document.querySelector('#minutes'),
-        secElement = document.querySelector('#seconds'),
-        promo = document.querySelector('.promotion__descr');
 
-  let now;
-  let timerId;
-  timerId = setInterval(() => {
-    now = new Date();
-    let difference = Date.parse(deadline)-now;
-    if(difference<=0) {
-      clearInterval(timerId);
-      return;
+  // Modal window
+
+  const modalTriggers = document.querySelectorAll('[data-modal]'),
+    modalWindow = document.querySelector('.modal'),
+    modalCloseButton = document.querySelector('[data-close]');
+
+    function closeModalWindow() {
+      modalWindow.classList.toggle('show');
+      document.body.style.overflow = '';
     }
-    let newDate = new Date(difference);
-    //console.log(newDate.getDate(), newDate.getHours(), newDate.getSeconds());
-    daysElement.textContent=newDate.getDate();
-    hoursElement.textContent=newDate.getHours();
-    minElement.textContent=newDate.getMinutes();
-    secElement.textContent=newDate.getSeconds();
-  
-  },1000);
+  // вешаем обработчик собыйтий открытия окна
+  modalTriggers.forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      //modalWindow.classList.add('show');
+      //modalWindow.classList.remove('hide');
+      modalWindow.classList.toggle('show');
+      document.body.style.overflow = 'hidden'; // для избежания прокрутки основной страницы
+    });
 
-      function replacePromoText(el, dateStr) {
-      let months = ["января", "февраля", "марта", "апреля", "мая", "июня",
-        "июля", "августа", "сентября", "октября", "ноября", "декабря"];
-      // 2020-07-01 12:46
-      let [ymd, timeStr] = dateStr.split(' ');
-      let [year, month, day] = ymd.split("-");
-      let newStr = day.substring(0, 2) + " " + months[+month - 1] + " " + year + " " + timeStr;
-      el.innerHTML = el.innerHTML.replace('Акция закончится 1 августа в 00:00', 'Акция закончится ' + newStr);
+  });
+  // добавляем обработчик собитий на "крестик"
+  modalCloseButton.addEventListener('click', () => {
+    //modalWindow.classList.add('hide');
+    //modalWindow.classList.remove('show');
+    //modalWindow.classList.toggle('show');
+    //document.body.style.overflow = '';
+    closeModalWindow();
+  });
+
+  // если кликнули за пределами окна (т.е. попали в div class=modal)
+  // или нажали ESC, то закрыть окно
+  modalWindow.addEventListener('click',(event)=> { // event можно не указывать, но это плохо
+    if(event.target === modalWindow) {
+        closeModalWindow();
     }
-
-*/
+  });
+  // обработка ESC
+  document.addEventListener('keydown',(event) => {
+      if(event.code === "Escape" && modalWindow.classList.contains('show')) {
+      closeModalWindow();
+    }
+  });
 
 
 }); // window.eventListener
