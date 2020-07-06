@@ -119,43 +119,60 @@ window.addEventListener('DOMContentLoaded', () => {
     modalWindow = document.querySelector('.modal'),
     modalCloseButton = document.querySelector('[data-close]');
 
-    function closeModalWindow() {
-      modalWindow.classList.toggle('show');
-      document.body.style.overflow = '';
-    }
+  // функции скрытия и показа модального  окна
+  function closeModalWindow() {
+    modalWindow.classList.toggle('show');
+    document.body.style.overflow = '';
+  }
+
+  function showModalWindow() {
+    modalWindow.classList.toggle('show');
+    document.body.style.overflow = 'hidden';
+    clearInterval(modalTimerId);
+  }
+
   // вешаем обработчик собыйтий открытия окна
   modalTriggers.forEach(trigger => {
-    trigger.addEventListener('click', (e) => {
-      //modalWindow.classList.add('show');
-      //modalWindow.classList.remove('hide');
-      modalWindow.classList.toggle('show');
-      document.body.style.overflow = 'hidden'; // для избежания прокрутки основной страницы
-    });
-
+    trigger.addEventListener('click', showModalWindow);
   });
   // добавляем обработчик собитий на "крестик"
-  modalCloseButton.addEventListener('click', () => {
-    //modalWindow.classList.add('hide');
-    //modalWindow.classList.remove('show');
-    //modalWindow.classList.toggle('show');
-    //document.body.style.overflow = '';
-    closeModalWindow();
-  });
+  modalCloseButton.addEventListener('click', closeModalWindow);
 
   // если кликнули за пределами окна (т.е. попали в div class=modal)
   // или нажали ESC, то закрыть окно
-  modalWindow.addEventListener('click',(event)=> { // event можно не указывать, но это плохо
-    if(event.target === modalWindow) {
-        closeModalWindow();
+  modalWindow.addEventListener('click', (event) => { // event можно не указывать, но это плохо
+    if (event.target === modalWindow) {
+      closeModalWindow();
     }
   });
   // обработка ESC
-  document.addEventListener('keydown',(event) => {
-      if(event.code === "Escape" && modalWindow.classList.contains('show')) {
+  document.addEventListener('keydown', (event) => {
+    if (event.code === "Escape" && modalWindow.classList.contains('show')) {
       closeModalWindow();
     }
   });
 
+  // модальное окно должно появиться через 8 сек
+  const modalTimerId = setTimeout(showModalWindow, 8000);
+  let isShowedModalAtBottom = false;
+
+  // показать модальное окно, когда юзер долистал до конца страницы
+  // window.addEventListener('scroll', (event) => {
+  //   if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+  //     if (!isShowedModalAtBottom) {
+  //       showModalWindow();
+  //       isShowedModalAtBottom = true;
+  //     }
+  //   }
+  // });
+  // новый вариант:
+  function showModalWindowOnScroll() {
+    if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+      showModalWindow();
+      window.removeEventListener('scroll',showModalWindowOnScroll);  
+    }
+  }
+  window.addEventListener('scroll', showModalWindowOnScroll);
 
 }); // window.eventListener
 
