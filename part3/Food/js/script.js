@@ -128,7 +128,7 @@ window.addEventListener('DOMContentLoaded', () => {
   function showModalWindow() {
     modalWindow.classList.toggle('show');
     document.body.style.overflow = 'hidden';
-    clearInterval(modalTimerId);
+    //clearInterval(modalTimerId);
   }
 
   // вешаем обработчик собыйтий открытия окна
@@ -153,28 +153,116 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   // модальное окно должно появиться через 8 сек
-  const modalTimerId = setTimeout(showModalWindow, 8000);
+  // закомментировано, чтобы не мешало
+  //const modalTimerId = setTimeout(showModalWindow, 8000);
   let isShowedModalAtBottom = false;
 
-  // показать модальное окно, когда юзер долистал до конца страницы
-  // window.addEventListener('scroll', (event) => {
-  //   if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
-  //     if (!isShowedModalAtBottom) {
-  //       showModalWindow();
-  //       isShowedModalAtBottom = true;
-  //     }
-  //   }
-  // });
   // новый вариант:
   function showModalWindowOnScroll() {
     if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
       showModalWindow();
-      window.removeEventListener('scroll',showModalWindowOnScroll);  
+      window.removeEventListener('scroll', showModalWindowOnScroll);
     }
   }
   window.addEventListener('scroll', showModalWindowOnScroll);
 
-}); // window.eventListener
+  //jshint ignore:start
+/*  
+// мой вариант шаблонного добления элементов:
+const menu = [
+  {
+    title: "Фитнес",
+    img: "img/tabs/vegy.jpg",
+    alt: "vegy",
+    menuDecription: 'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!', 
+    price: "229"
+  },
+  {
+    title: "Премиум",
+    img: "img/tabs/elite.jpg",
+    alt: "elite",
+    menuDecription: 'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!', 
+    price: "550"
+  },
+  {
+    title: "Постное",
+    img: "img/tabs/post.jpg",
+    alt: "post",
+    menuDecription: 'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',  // jshint ignore:line
+    price: "180"
+  }
+
+];
+const menuContent = document.querySelector(".menu__field>.container");
+//console.log(menuContent);
+menuContent.innerHTML = "";
+let html = "";
+menu.forEach(item => {
+  html += `<div class="menu__item"><img src="${item.img}" alt="${item.alt}">
+<h3 class="menu__item-subtitle">Меню "${item.title}"</h3>
+<div class="menu__item-descr">${item.menuDecription}</div>
+<div class="menu__item-divider"></div>
+<div class="menu__item-price">
+    <div class="menu__item-cost">Цена:</div>
+    <div class="menu__item-total"><span>${item.price}</span> грн/день</div>
+</div>
+</div>`;
+});
+menuContent.innerHTML=html;
+
+*/
+// jshint ignore:end
+// ниже = вариант учителя
+
+class MenuCard {
+  constructor(src, alt,title,descr,price,parentSelector) {
+    this.src=src;
+    this.alt=alt;
+    this.title=title;
+    this.descr = descr;
+    this.price=price; // в USD
+    this.parent = document.querySelector(parentSelector);
+    this.currencyRate = 72.171; // на 08.07.2020. Потом будем брать с сайта ЦБ
+    this.changeToRUR(); // преобразуем цену USD в RUR
+  }
+  // метод конвертации валюты в рубли. price в долларах
+  changeToRUR() {
+    this.price = Math.round(this.price * this.currencyRate,2);
+  }
+  // отображение карточки продукта
+  render() {
+    // в цену падает сконвертированное значение
+    let html = `<img src=${this.src} alt=${this.alt}>
+    <h3 class="menu__item-subtitle">Меню "${this.title}"</h3>
+    <div class="menu__item-descr">${this.descr}</div>
+    <div class="menu__item-divider"></div>
+    <div class="menu__item-price">
+        <div class="menu__item-cost">Цена:</div>
+        <div class="menu__item-total"><span>${this.price}</span> руб.</div>
+    </div>`;
+    const el = document.createElement("div");
+    el.classList.add("menu__item");
+    el.innerHTML = html;
+    this.parent.append(el);
+  }
+ }
+// создаем карточки продуктов. Можно в цикле
+// jshint ignore: start
+const selector = ".menu__field>.container";
+new MenuCard("img/tabs/vegy.jpg","vegy","Фитнес",
+'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+3.5,selector).render();
+new MenuCard("img/tabs/elite.jpg","elite","Премиум",
+'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+4.2,selector).render();
+new MenuCard("img/tabs/post.jpg","post","Постное",
+'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+1.0,selector).render();
+// jshint ignore: end
+
+
+}); // window - контент загружен
+
 
 
 
