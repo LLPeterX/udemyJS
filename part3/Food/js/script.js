@@ -215,12 +215,14 @@ menuContent.innerHTML=html;
 // ниже = вариант учителя
 
 class MenuCard {
-  constructor(src, alt,title,descr,price,parentSelector) {
+  constructor(src, alt,title,descr,price,parentSelector, ...classes) {
     this.src=src;
     this.alt=alt;
     this.title=title;
     this.descr = descr;
     this.price=price; // в USD
+    this.classes = classes; // array or undefined
+    //this.classes = classes.length>0 ? classes : ["menu__item"];
     this.parent = document.querySelector(parentSelector);
     this.currencyRate = 72.171; // на 08.07.2020. Потом будем брать с сайта ЦБ
     this.changeToRUR(); // преобразуем цену USD в RUR
@@ -241,7 +243,14 @@ class MenuCard {
         <div class="menu__item-total"><span>${this.price}</span> руб.</div>
     </div>`;
     const el = document.createElement("div");
-    el.classList.add("menu__item");
+    if(this.classes.length===0) {
+      this.classes = ['menu__item'];
+    }
+    this.classes.forEach(className => el.classList.add(className));
+  //  } else {
+      //el.classList.add("menu__item")
+    //}
+
     el.innerHTML = html;
     this.parent.append(el);
   }
@@ -251,10 +260,10 @@ class MenuCard {
 const selector = ".menu__field>.container";
 new MenuCard("img/tabs/vegy.jpg","vegy","Фитнес",
 'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-3.5,selector).render();
+3.5,selector,"menu__item").render();
 new MenuCard("img/tabs/elite.jpg","elite","Премиум",
 'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-4.2,selector).render();
+4.2,selector,"menu__item").render();
 new MenuCard("img/tabs/post.jpg","post","Постное",
 'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
 1.0,selector).render();
