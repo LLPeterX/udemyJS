@@ -219,7 +219,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const forms = document.querySelectorAll('form');
   // массив, в котором данные  ходе выполнени запроса:
   let message = {
-    loading: "Загрузка",
+    loading: "img/form/spinner.svg",
     success: "Спасибо! Мы с вами свяжемся.",
     failure: "Извините, произошла ошибка"
   };
@@ -233,10 +233,14 @@ window.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       // div для сообщения о результате - будет в нижней части формы
       const statusMessage = document.createElement('div');
-      statusMessage.classList.add('status');
-      statusMessage.textContent = message.loading;
+      //statusMessage.classList.add('status');
+      statusMessage.src=message.loading;
+      statusMessage.style.cssText = "display: 'block'; margin: 0 auto;";
+      //statusMessage.textContent = message.loading;
       setTimeout(() => statusMessage.remove(),5000);
-      form.append(statusMessage);
+      //form.append(statusMessage);
+      form.insertAdjacentElement('afterend',statusMessage); // всё равно не работает
+    
 
       const req = new XMLHttpRequest();
       req.open('POST', 'http://food/server2.php');
