@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
   function hideTabContent() {
     // скрываем содержимое 
     tabContent.forEach(item => item.classList.add("hide"));
-    // удаляем класс активного пункта (жирный шрифт)
+    // удаляем класс активного пункта vменю (жирный шрифт)
     menuItems.forEach(item => {
       item.classList.remove("tabheader__item_active");
       item.classList.remove("fade");
@@ -37,7 +37,6 @@ window.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
-
   });
 
   hideTabContent();
@@ -193,10 +192,6 @@ window.addEventListener('DOMContentLoaded', () => {
         this.classes = ['menu__item'];
       }
       this.classes.forEach(className => el.classList.add(className));
-      //  } else {
-      //el.classList.add("menu__item")
-      //}
-
       el.innerHTML = html;
       this.parent.append(el);
     }
@@ -236,35 +231,35 @@ window.addEventListener('DOMContentLoaded', () => {
       //statusMessage.classList.add('status');
       statusMessage.src=message.loading;
       statusMessage.style.cssText = "display: 'block'; margin: 0 auto;";
-      //statusMessage.textContent = message.loading;
       setTimeout(() => statusMessage.remove(),5000);
-      //form.append(statusMessage);
       form.insertAdjacentElement('afterend',statusMessage); // всё равно не работает
     
-
-      const req = new XMLHttpRequest();
-      req.open('POST', 'http://food/server2.php');
-      //req.open('POST', 'server2.php');
       const formData = new FormData(form);
-      req.setRequestHeader('Content-type','application/json; charset=utf-8');
       const formObj={};
       formData.forEach((value, key) => {
         formObj[key] = value;
       } );
       const json = JSON.stringify(formObj);
-      console.log('json:',json);
-      req.send(json);
-      req.addEventListener('load', () => {
-        if (req.status === 200) {
-          console.log('SERVER RESP:',req.response); // empty string
+      fetch('http://food/server2x.php',{
+        method: 'POST',
+         headers: {
+          'Content-Type': 'application/json; charset=utf-8'
+         },
+        body: json
+      })
+      .then(response => response.text())
+      .then(response => {
+          console.log('SERVER RESP:',response); // empty string
           showThanksModal(message.success); // закроется через 4 сек.
-          form.reset(); // очистка формы
+          //form.reset(); // очистка формы - перенесено в .finally()
           statusMessage.remove(); // удаляем спиннер
-        } else {
-          showThanksModal(message.failure);
-        }
+      })
+      .catch(()=> {
+        showThanksModal(message.failure);
+      })
+      .finally(()=> {
+        form.reset();
       });
-
     });
   } // postData()
 
@@ -289,7 +284,7 @@ window.addEventListener('DOMContentLoaded', () => {
     parent.append(thanksModal);
     setTimeout(()=>{
       thanksModal.remove();
-      //prevModalDialog.classList.replace('hide','show');
+      //prevModalDialog.classList.replace('hide','show'); // нельзя!
       prevModalDialog.classList.remove('hide');
       prevModalDialog.classList.add('show');
       closeModalWindow();
