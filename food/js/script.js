@@ -50,7 +50,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const hours = Math.floor((t / (1000 * 60 * 60)) % 24);
     const minutes = Math.floor((t / (1000 * 60)) % 60);
     const seconds = Math.floor((t / 1000) % 60);
-    // возвращаем объект
     return ({
       total: t, days, hours, minutes, seconds
     });
@@ -65,7 +64,6 @@ window.addEventListener('DOMContentLoaded', () => {
       actionsTimer = setInterval(updateClock, 1000);
 
     updateClock(); // чтобы избежать показа старых значение элементов
-
 
     function updateClock() {
       const t = getRemainingTime(endtime);
@@ -93,7 +91,6 @@ window.addEventListener('DOMContentLoaded', () => {
     function replacePromoText(selector, dateStr) {
       let months = ["января", "февраля", "марта", "апреля", "мая", "июня",
         "июля", "августа", "сентября", "октября", "ноября", "декабря"];
-      // 2020-07-01 12:46
       const el = document.querySelector(selector);
       let [ymd, timeStr] = dateStr.split(' ');
       let [year, month, day] = ymd.split("-");
@@ -128,7 +125,7 @@ window.addEventListener('DOMContentLoaded', () => {
     trigger.addEventListener('click', showModalWindow);
   });
 
-    // если кликнули за пределами окна (т.е. попали в div class=modal)
+  // если кликнули за пределами окна (т.е. попали в div class=modal)
   // или нажали ESC, или элемент содержит атрибут "data-close", то закрыть окно
   modalWindow.addEventListener('click', (event) => {
     if (event.target === modalWindow || event.target.getAttribute('data-close')=='') {
@@ -142,9 +139,9 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- модальное окно должно появиться через 1 мин.
+  // модальное окно должно появиться через 1 мин.
   // --- закомментировано, чтобы не мешало
-  const modalTimerId = setTimeout(showModalWindow, 60000);
+  //const modalTimerId = setTimeout(showModalWindow, 60000);
 
   // Показать окно при прокрутке до конца всего сайта
   function showModalWindowOnScroll() {
@@ -153,8 +150,6 @@ window.addEventListener('DOMContentLoaded', () => {
       window.removeEventListener('scroll', showModalWindowOnScroll);
     }
   }
-  // вешаем событие на прокрутку - чтобы при прокрутке до конца страницы
-  // появлялось окно обратной связи.
   window.addEventListener('scroll', showModalWindowOnScroll);
 
   // ------------- карточки продуктов ----------------------
@@ -167,9 +162,8 @@ window.addEventListener('DOMContentLoaded', () => {
       this.descr = descr;
       this.price = price; // в USD
       this.classes = classes; // array or undefined
-      //this.classes = classes.length>0 ? classes : ["menu__item"];
       this.parent = document.querySelector(parentSelector);
-      this.currencyRate = 72.171; // на 08.07.2020. Потом будем брать с сайта ЦБ
+      this.currencyRate = 72.171;
       this.changeToRUR(); // преобразуем цену USD в RUR
     }
     // метод конвертации валюты в рубли. price в долларах
@@ -178,7 +172,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
     // отображение карточки продукта
     render() {
-      // в цену падает сконвертированное значение
       let html = `<img src=${this.src} alt=${this.alt}>
     <h3 class="menu__item-subtitle">Меню "${this.title}"</h3>
     <div class="menu__item-descr">${this.descr}</div>
@@ -196,7 +189,6 @@ window.addEventListener('DOMContentLoaded', () => {
       this.parent.append(el);
     }
   }
-  // создаем карточки продуктов. Можно в цикле
   // jshint ignore: start
   const selector = ".menu__field>.container";
 
@@ -211,11 +203,7 @@ window.addEventListener('DOMContentLoaded', () => {
   //   1.0, selector).render();
 // jshint ignore: end
   
-// ---------- 4.59. Получение данных с сервера --------------
-
-    
-
-  // --------------- 4.53. Передача данных форм на сервер -------------
+// --------------- 4.53, 59. Передача данных форм обратной связи на сервер -------------
   const forms = document.querySelectorAll('form');
   // массив, в котором данные  ходе выполнени запроса:
   let message = {
@@ -228,13 +216,25 @@ window.addEventListener('DOMContentLoaded', () => {
     bindPostData(item);
   });
 
-  
+  // функция обращения к серверу.
+  // @param url - URL запроса
+  // @param data - данные 
+  const postData = async (url,data) => {
+    const res =  await fetch(url,{
+       method: 'POST',
+       headers: {
+        'Content-Type': 'application/json; charset=utf-8'
+      },
+      body: data});
+      return res.json(); // ответ - promise!
+  };
+
+  // функция обработки и отправки данных формы обратной связи
   function bindPostData(form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      // div для сообщения о результате - будет в нижней части формы
+      // div для сообщения о результате в нижней части формы
       const statusMessage = document.createElement('div');
-      //statusMessage.classList.add('status');
       statusMessage.src=message.loading;
       statusMessage.style.cssText = "display: 'block'; margin: 0 auto;";
       setTimeout(() => statusMessage.remove(),5000);
@@ -246,19 +246,12 @@ window.addEventListener('DOMContentLoaded', () => {
         formObj[key] = value;
       } );
       const json = JSON.stringify(formObj);
-      fetch('http://food/server2x.php',{
-        method: 'POST',
-         headers: {
-          'Content-Type': 'application/json; charset=utf-8'
-         },
-        body: json
-      })
-      .then(response => response.text())
+
+      postData('http://localhost:3000/requests',json)
       .then(response => {
-          console.log('SERVER RESP:',response); // empty string
-          showThanksModal(message.success); // закроется через 4 сек.
-          //form.reset(); // очистка формы - перенесено в .finally()
-          statusMessage.remove(); // удаляем спиннер
+          console.log('SERVER RESP:',response);
+          showThanksModal(message.success); // Окно "спасибо", закроется через 4 сек.
+          statusMessage.remove(); // удаляем спиннер со статусом под формой
       })
       .catch(()=> {
         showThanksModal(message.failure);
@@ -266,7 +259,8 @@ window.addEventListener('DOMContentLoaded', () => {
       .finally(()=> {
         form.reset();
       });
-    });
+
+    }); // event listener
   } // bindPostData()
 
   // ---------------- 54. Оповещение пользователя -----------
@@ -290,14 +284,13 @@ window.addEventListener('DOMContentLoaded', () => {
     parent.append(thanksModal);
     setTimeout(()=>{
       thanksModal.remove();
-      //prevModalDialog.classList.replace('hide','show'); // нельзя!
       prevModalDialog.classList.remove('hide');
       prevModalDialog.classList.add('show');
       closeModalWindow();
     },4000);
-  }
-
-  fetch('http://localhost:3000/menu').then(data=>data.json()).then(res=>console.log(res));
+  } // end thanksModal
+//  -- test fetch()
+//  fetch('http://localhost:3000/menu').then(data=>data.json()).then(res=>console.log(res));
 
 
 }); // end 'DOMContentLoaded'
