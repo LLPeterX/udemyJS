@@ -5,6 +5,7 @@
 /food/node_modules
 /.pnp
 .pnp.js
+*.docm
 
 # testing
 /coverage
